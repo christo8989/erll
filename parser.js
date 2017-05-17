@@ -4,8 +4,9 @@
 // S -> id E | [empty]
 // E -> + id E | - id E | * id E | / id E [empty]
 
-(function ( Clock ) {
-    var exp = "2+3234-234*2/23"
+(function ( expression ) {
+    var exp = expression || "2+32+[my_age]-234*2/23"
+    var Clock = window.Clock
     var token = ""
     var L = ""
     var i = 0
@@ -29,9 +30,9 @@
             ID()
             E()
         } else if ( L === undefined ) {
-            throw new Error( "In function S, no expression was found." )
+            throw new Error( "In function 'START', no expression was found." )
         } else {	
-            throwError( "In function S, there was a mismatch", i )
+            throwError( "START", "there was a mismatch", i )
         }
         
         return
@@ -48,7 +49,7 @@
         } else if ( L === undefined ) {
             return 
         } else {	
-            throwError( "In function 'E', there was a mismatch", i )
+            throwError( "E", "there was a mismatch", i )
         }
         
         return
@@ -59,8 +60,12 @@
         if ( isNumber( L ) ) {
             match( isNumber )
             NUMBER()
+        } else if ( L === "[" ) {
+            match( "[" )
+            VAR()
+            match( "]" )
         } else {
-            throwError( "In function 'N', there was a mismatch", i )
+            throwError( "ID", "there was a mismatch", i )
         }
 
         addToken()
@@ -71,8 +76,29 @@
         if ( isNumber( L ) ) {
             match( isNumber )
             NUMBER()
-        } else if ( L === " " ) {
-            removeWhitespaces()
+        } 
+
+        return
+    }
+
+    ;function VAR() {
+        if ( isLowerCaseLetter( L ) ) {
+            match( isLowerCaseLetter )
+            VAR_NAME()
+        } else {
+            throwError( "VAR", "there was a mismatch", i )
+        }
+
+        return
+    }
+
+    ;function VAR_NAME() {
+        if ( isLowerCaseLetter( L ) ) {
+            match( isLowerCaseLetter )
+            VAR_NAME()
+        } else if ( L === "_" ) {
+            match( "_" )
+            VAR_NAME()
         } 
 
         return
@@ -85,6 +111,12 @@
             result.push( token )
             token = ""
         }
+    }
+
+    ;function isLowerCaseLetter( letter ) {
+        //TODO: Refactor - Use character codes.
+        var lowerCaseLetters = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ]
+        return lowerCaseLetters.includes( letter )
     }
 
     ;function isNumber( letter ) {
@@ -116,12 +148,12 @@
         L = exp[ i++ ]
     }
 
-    ;function throwError( message, index ) {
-        var error = new Error(message + " at character " + index);
+    ;function throwError( functionName, message, index ) {
+        var error = new Error( "In function '" + functionName + "' " + message + " at character " + index);
         error.index = index;
         error.description = message;
         throw error;
     }
 
-})( window.Clock )
+})()
 
