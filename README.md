@@ -3,6 +3,10 @@ Just learning about Recursive Descent.
 
 ## Grammar
 
-S -> id E | [empty]
+START -> ID E
 
-E -> + id E | - id E | * id E | / id E | [empty]
+E -> + ID E | - ID E | * ID E | / ID E | {empty}
+
+ID -> [0..9] NUMBER  //| [ ID ]
+
+NUMBER -> [0..9] NUMBER | {empty}

@@ -5,28 +5,31 @@
 // E -> + id E | - id E | * id E | / id E [empty]
 
 (function ( Clock ) {
-    var exp = "id+id*id-id+id/id"
+    var exp = "2+3234-234*2/23"
     var token = ""
     var L = ""
     var i = 0
     result = []
 
+
+
+    console.log( exp )
     Clock.timeRaw( "Main", Main )
     console.log( result )
 
+
+
     ;function Main() {
         next()
-        S()
+        START()
     }
 
-    ;function S() {
-        if ( L === "i" ) {
-            match( "i" )
-            match( "d" )
-            addToken()
+    ;function START() {
+        if ( isNumber( L ) ) {
+            ID()
             E()
         } else if ( L === undefined ) {
-            return
+            throw new Error( "In function S, no expression was found." )
         } else {	
             throwError( "In function S, there was a mismatch", i )
         }
@@ -37,12 +40,10 @@
     ;function E() {
         var operators = [ "+", "-", "*", "/" ]
         if ( operators.includes( L ) ) {
-            match( L )
+            match( operators )
             addToken()
 
-            match( "i" )
-            match( "d" )
-            addToken()
+            ID()
             E()		
         } else if ( L === undefined ) {
             return 
@@ -53,14 +54,56 @@
         return
     }
 
+    
+    ;function ID() {
+        if ( isNumber( L ) ) {
+            match( isNumber )
+            NUMBER()
+        } else {
+            throwError( "In function 'N', there was a mismatch", i )
+        }
 
-    ;function next() {	
-        token += L
-        L = exp[ i++ ]
+        addToken()
+        return
     }
 
-    ;function match( letter ) {
-        if ( letter === L ) {
+    ;function NUMBER() {
+        if ( isNumber( L ) ) {
+            match( isNumber )
+            NUMBER()
+        } else if ( L === " " ) {
+            removeWhitespaces()
+        } 
+
+        return
+    }
+
+
+
+    ;function addToken() {
+        if ( token.trim() !== "" ) {
+            result.push( token )
+            token = ""
+        }
+    }
+
+    ;function isNumber( letter ) {
+        var number
+        if ( typeof letter === "string" ) {
+            number = parseInt( letter )
+        } else if ( typeof letter === "number" ) {
+            number = letter
+        }
+
+        return isNaN( number ) === false 
+            && typeof number === "number"
+    }
+
+    ;function match( item ) {
+        var isCorrect = ( typeof item === "function" && item( L ) )
+            || ( Array.isArray( item ) && item.includes( L ) )
+            || ( item === L )
+        if ( isCorrect ) {
             next()
             return true
         } else {
@@ -68,9 +111,9 @@
         }
     }
 
-    ;function addToken() {
-        result.push( token )
-        token = ""
+    ;function next() {	
+        token += L
+        L = exp[ i++ ]
     }
 
     ;function throwError( message, index ) {
@@ -79,5 +122,6 @@
         error.description = message;
         throw error;
     }
+
 })( window.Clock )
 
