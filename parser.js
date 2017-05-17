@@ -6,6 +6,7 @@
 
 (function ( Clock ) {
     var exp = "id+id*id-id+id/id"
+    var token = ""
     var L = ""
     var i = 0
     result = []
@@ -13,8 +14,8 @@
     Clock.timeRaw( "Main", Main )
     console.log( result )
 
-    ;function Main () {
-        getNext()
+    ;function Main() {
+        next()
         S()
     }
 
@@ -22,7 +23,7 @@
         if ( L === "i" ) {
             match( "i" )
             match( "d" )
-            result.push("id");
+            addToken()
             E()
         } else if ( L === undefined ) {
             return
@@ -34,34 +35,15 @@
     }
 
     ;function E() {
-        if ( L === "+" ) {
-            match( "+" )
-            result.push( "+" )
+        var operators = [ "+", "-", "*", "/" ]
+        if ( operators.includes( L ) ) {
+            match( L )
+            addToken()
+
             match( "i" )
             match( "d" )
-            result.push( "id" )
+            addToken()
             E()		
-        } else if ( L === "-" ) {
-            match( "-" )
-            result.push( "-" )
-            match( "i" )
-            match( "d" )
-            result.push( "id" )
-            E()
-        } else if ( L === "*" ) {
-            match( "*" )
-            result.push( "*" )
-            match( "i" )
-            match( "d" )
-            result.push( "id" )
-            E()
-        } else if ( L === "/" ) {
-            match( "/" )
-            result.push( "/" )
-            match( "i" )
-            match( "d" )
-            result.push( "id" )
-            E()
         } else if ( L === undefined ) {
             return 
         } else {	
@@ -71,17 +53,24 @@
         return
     }
 
-    ;function getNext() {	
+
+    ;function next() {	
+        token += L
         L = exp[ i++ ]
     }
 
-    ;function match ( letter ) {
+    ;function match( letter ) {
         if ( letter === L ) {
-            getNext()
+            next()
             return true
         } else {
             throwError( "There was a mismatch", i )
         }
+    }
+
+    ;function addToken() {
+        result.push( token )
+        token = ""
     }
 
     ;function throwError( message, index ) {
