@@ -9,7 +9,7 @@ MATH_EXPRESSION -> TOKEN MATH | TOKEN
 
 MATH -> OPERATOR_MATH TOKEN MATH | {empty}
 
-#### Grammar - 0.0.1 - TOKENS
+## Grammar - 0.0.1 - TOKENS
 
 TOKEN -> DIGIT NUMBER | . RATIONAL | ' STRING ' | [ VAR ]
 
@@ -24,7 +24,7 @@ VAR -> LOWERCASE VAR_NAME
 VAR_NAME -> LOWERCASE VAR_NAME | _ VAR_NAME | {empty}
 
 
-#### Grammar - Literals
+## Grammar - Literals
 
 CHARACTER -> NUMBER | ALPHABET | SYMBOL | (ESCAPE_CHARACTER)?
 
