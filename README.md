@@ -1,46 +1,32 @@
 # parser-recursive-descent
 Just learning about Recursive Descent.
 
-## Grammar
+## Grammar - 0.0.1 - TOKENS
 
-START -> ID E
+START -> TOKEN
 
-E -> + ID E | - ID E | * ID E | / ID E | {empty}
+TOKEN -> DIGIT NUMBER | . RATIONAL | ' STRING ' | [ VAR ]
 
-ID -> [ VAR ] | [0..9] NUMBER
+NUMBER -> DIGIT NUMBER | . RATIONAL | {empty}
+
+RATIONAL -> DIGIT RATIONAL | {empty}
+
+STRING -> CHARACTER STRING | {empty}
+
+CHARACTER -> NUMBER | ALPHABET | SYMBOL | (ESCAPE_CHARACTER)?
 
 VAR -> LOWERCASE VAR_NAME
 
-VAR_NAME -> LOWERCASE VAR_NAME | _ VAR_Name | {empty}
+VAR_NAME -> LOWERCASE VAR_NAME | _ VAR_NAME | {empty}
 
-NUMBER -> [0..9] NUMBER | {empty}
+ALPHABET -> LOWERCASE | UPPERCASE
 
-LOWERCASE -> [a..z]
-
-
-
-
-
-#### Grammar (In the Future)
-
-START -> ID E
-
-E -> + ID E | - ID E | * ID E | / ID E | {empty}
-
-ID -> ' STRING ' | [0..9] NUMBER
-
-STRING -> CHAR STRING | {empty}
-
-CHAR -> NUMBER | LETTER | SYMBOL | ESCAPE_CHAR
-
-NUMBER -> [0..9] NUMBER | {empty}
-
-LETTER -> LOWERCASE | UPPERCASE
+DIGIT -> [0..9]
 
 LOWERCASE -> [a..z]
 
-UPPERCASE -> [A..Z] 
+UPPERCASE -> [A..Z]
 
-SYMBOL -> [`,~,!,@,... except for ']
+SYMBOL -> [~,`,!,@,#,$,%,^,..] & does not include '
 
-ESCAPE_CHAR -> ' ' 
+(ESCAPE_CHARACTER -> '')?
