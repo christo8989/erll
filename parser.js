@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name]"
+    var expression = "[var_name]+'7'*10.745"
 
     console.log( "Expression:", expression )
     Clock.time( "Parse", function () { 
@@ -16,11 +16,11 @@
 
     var exp = expression
     var token = ""
-    var L = ""  //current letter
-    var i = 0   //index
+    var L = ""      //current letter
+    var i = 0       //index
     result = []
 
-    Main() //Execute Parser
+    Main()          //Execute Parser
 
 
 
@@ -30,8 +30,26 @@
     }
 
     ;function START() {
-        TOKEN()
+        MATH_EXPRESSION()
         
+        return
+    }
+
+    ;function MATH_EXPRESSION() {  
+        TOKEN()
+        MATH()
+        return
+    }
+
+    ;function MATH() {
+        if ( isOperatorMath( L ) ) {
+            match( isOperatorMath )
+            addToken()
+
+            TOKEN()
+            MATH()
+        } 
+
         return
     }
     
@@ -45,21 +63,17 @@
         } else if ( L === "'" ) {
             match( "'" )
             STRING()
-
-            if ( L !== "'" ) {
-                throwExpectingError( "TOKEN", "\"'\"", i )
-            }
             match( "'" )
         } else if ( L === "[" ) {
             match( "[" )
             VAR()
 
             if ( L !== "]" ) {
-                throwExpectingError( "TOKEN", "']'", i )
+                throwExpectingError( "TOKEN", "lowercase letter [a..z], '_', or ']'", i )
             }
             match( "]" )
         } else {
-            throwExpectingError( "TOKEN", "'TOKEN'", i )
+            throwExpectingError( "TOKEN", "number, string, or variable", i )
         }
 
         addToken()
@@ -138,12 +152,6 @@
         }
     }
 
-    ;function isLowerCaseLetter( letter ) {
-        //TODO: Refactor - Use character codes.
-        var lowerCaseLetters = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ]
-        return lowerCaseLetters.includes( letter )
-    }
-
     ;function isDigit( letter ) {
         var number
         if ( typeof letter === "string" ) {
@@ -154,6 +162,17 @@
 
         return isNaN( number ) === false 
             && typeof number === "number"
+    }
+
+    ;function isLowerCaseLetter( letter ) {
+        //TODO: Refactor - Use character codes.
+        var lowerCaseLetters = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ]
+        return lowerCaseLetters.includes( letter )
+    }
+
+    ;function isOperatorMath( letter ) {
+        var operatorMath = [ "+", "-", "*", "/", "%" ]
+        return operatorMath.includes( letter )
     }
 
     ;function match( item ) {
@@ -175,10 +194,16 @@
 
 
 
-    ;function throwError( message, index ) {
+    ;function throwError( message, index ) {        
+        var firstPart = "%c" + exp.substring( 0, index - 1 )
+        var letter = "%c" + exp.substring( index - 1, index )
+        var secondPart = "%c" + exp.substring( index )
+        var fontSize = "font-size: 16px;"
+        var partCss = "color:grey;" + fontSize
+        var letterCss = "color:white;" + fontSize
+        console.info( firstPart + letter + secondPart , partCss, letterCss, partCss )
+
         var error = new Error( message )
-        error.index = index
-        error.description = message
         throw error
     }
 
