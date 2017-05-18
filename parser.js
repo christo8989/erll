@@ -1,22 +1,26 @@
 /// Recursive Descent Parser
 //https://www.youtube.com/watch?v=SH5F-rwWEog&t=3m12s
 
-// S -> id E | [empty]
-// E -> + id E | - id E | * id E | / id E [empty]
+(function IIFE ( parser ) {
 
-(function ( expression ) {
-    var exp = expression || "2+32+[my_age]-234*2/23"
     var Clock = window.Clock
+    var expression = "[var_name]"
+
+    console.log( "Expression:", expression )
+    Clock.time( "Parse", function () { 
+        parser( expression )
+    } )
+    console.log( result )
+
+})(function parser ( expression ) {
+
+    var exp = expression
     var token = ""
-    var L = ""
-    var i = 0
+    var L = ""  //current letter
+    var i = 0   //index
     result = []
 
-
-
-    console.log( exp )
-    Clock.timeRaw( "Main", Main )
-    console.log( result )
+    Main() //Execute Parser
 
 
 
@@ -26,46 +30,36 @@
     }
 
     ;function START() {
-        if ( isNumber( L ) ) {
-            ID()
-            E()
-        } else if ( L === undefined ) {
-            throw new Error( "In function 'START', no expression was found." )
-        } else {	
-            throwError( "START", "there was a mismatch", i )
-        }
+        TOKEN()
         
         return
     }
-
-    ;function E() {
-        var operators = [ "+", "-", "*", "/" ]
-        if ( operators.includes( L ) ) {
-            match( operators )
-            addToken()
-
-            ID()
-            E()		
-        } else if ( L === undefined ) {
-            return 
-        } else {	
-            throwError( "E", "there was a mismatch", i )
-        }
-        
-        return
-    }
-
     
-    ;function ID() {
-        if ( isNumber( L ) ) {
-            match( isNumber )
+    ;function TOKEN() {
+        if ( isDigit( L ) ) {
+            match( isDigit )
             NUMBER()
+        } else if ( L === "." ) {
+            match( "." )
+            RATIONAL()
+        } else if ( L === "'" ) {
+            match( "'" )
+            STRING()
+
+            if ( L !== "'" ) {
+                throwExpectingError( "TOKEN", "\"'\"", i )
+            }
+            match( "'" )
         } else if ( L === "[" ) {
             match( "[" )
             VAR()
+
+            if ( L !== "]" ) {
+                throwExpectingError( "TOKEN", "']'", i )
+            }
             match( "]" )
         } else {
-            throwError( "ID", "there was a mismatch", i )
+            throwExpectingError( "TOKEN", "'TOKEN'", i )
         }
 
         addToken()
@@ -73,10 +67,41 @@
     }
 
     ;function NUMBER() {
-        if ( isNumber( L ) ) {
-            match( isNumber )
+        if ( isDigit( L ) ) {
+            match( isDigit )
             NUMBER()
-        } 
+        } else if ( L === "." ) {
+            match( "." )
+            RATIONAL()
+        }
+
+        return
+    }
+
+    ;function RATIONAL() {
+        if ( isDigit(L) ) {
+            match( isDigit )
+            RATIONAL()
+        }
+
+        return
+    }
+
+    ;function STRING() {
+        if ( L === "'" ) {
+            //Add later?
+            /*
+            match( "'" )
+            
+            if ( L === "'" ) {
+                match( "'" )
+                STRING()
+            }
+            */
+        } else {
+            match( L )
+            STRING()
+        }
 
         return
     }
@@ -86,7 +111,7 @@
             match( isLowerCaseLetter )
             VAR_NAME()
         } else {
-            throwError( "VAR", "there was a mismatch", i )
+            throwExpectingError( "VAR", "lowercase letter [a..z]", i )
         }
 
         return
@@ -119,7 +144,7 @@
         return lowerCaseLetters.includes( letter )
     }
 
-    ;function isNumber( letter ) {
+    ;function isDigit( letter ) {
         var number
         if ( typeof letter === "string" ) {
             number = parseInt( letter )
@@ -148,12 +173,23 @@
         L = exp[ i++ ]
     }
 
-    ;function throwError( functionName, message, index ) {
-        var error = new Error( "In function '" + functionName + "' " + message + " at character " + index);
-        error.index = index;
-        error.description = message;
-        throw error;
+
+
+    ;function throwError( message, index ) {
+        var error = new Error( message )
+        error.index = index
+        error.description = message
+        throw error
     }
 
-})()
+    ;function throwExpectingError( functionName, expecting, index ) {
+        var message = "In function '" 
+            + functionName + "', expecting a(n) " 
+            + expecting + " at character " 
+            + index + ".";
+        
+        throwError( message, index )
+    }
+
+})
 
