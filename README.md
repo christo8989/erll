@@ -3,44 +3,23 @@ Just learning about Recursive Descent.
 
 ## Grammar
 
-START -> ID E
+START -> ID E 
 
-E -> + ID E | - ID E | * ID E | / ID E | {empty}
+E -> + {STACK} ID E {PRINT} | - {STACK} ID E {PRINT} | * {STACK} ID E {PRINT} | / {STACK} ID E {PRINT} | {empty}
 
-ID -> [ VAR ] | [0..9] NUMBER
+ID -> [ VAR ] {STACK} {PRINT} | [0..9] {STACK} {PRINT}
 
 VAR -> LOWERCASE VAR_NAME
 
 VAR_NAME -> LOWERCASE VAR_NAME | _ VAR_Name | {empty}
 
-NUMBER -> [0..9] NUMBER | {empty}
+NUMBER -> [0..9] NUMBER | {empty} {PUSH}
 
 LOWERCASE -> [a..z]
 
 
+## Semantics
 
+{PRINT} -> console.log(stack.pop())
 
-
-#### Grammar (In the Future)
-
-START -> ID E
-
-E -> + ID E | - ID E | * ID E | / ID E | {empty}
-
-ID -> ' STRING ' | [0..9] NUMBER
-
-STRING -> CHAR STRING | {empty}
-
-CHAR -> NUMBER | LETTER | SYMBOL | ESCAPE_CHAR
-
-NUMBER -> [0..9] NUMBER | {empty}
-
-LETTER -> LOWERCASE | UPPERCASE
-
-LOWERCASE -> [a..z]
-
-UPPERCASE -> [A..Z] 
-
-SYMBOL -> [`,~,!,@,... except for ']
-
-ESCAPE_CHAR -> ' ' 
+{STACK} -> stack.push(token)
