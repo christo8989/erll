@@ -4,30 +4,38 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "2+32+[my_age]-2asd34*2/23"
+    var expression = "234+5-39*[var_name]"
 
-    console.log( "Expression:", expression )
+    var result
     Clock.time( "Parse", function () { 
-        parser( expression )
+        result = parser( expression )
     } )
+    
+    console.log( "Expression:", expression )
+    console.log( result )
 
 })(function parser ( expression ) {
+    //GLOBAL PRIVATE PROPERTIES
     var exp = expression 
     var Clock = window.Clock
     var token = ""
-    var L = ""
-    var i = 0
+    var L = ""  //look-ahead
+    var i = 0   //index
     var stack = []
 
 
-
-    ;(function Main() {
+    // MAIN \\
+    return (function Main() {
         next()
         START()
+        return POP()
     })()
+
+
 
     ///Parser
     ;function START() {
+        var node
         if ( isNumber( L ) ) {
             ID()
             E()
@@ -47,8 +55,9 @@
             STACK()
 
             ID()
-            E()		
-            PRINT()
+            E()	
+
+            E_SEMANTICS_ONE()
         } else if ( L === undefined ) {
             return 
         } else {	
@@ -57,9 +66,9 @@
         
         return
     }
-
     
     ;function ID() {
+        var result = ""
         if ( isNumber( L ) ) {
             match( isNumber )
             NUMBER()
@@ -72,7 +81,6 @@
         }
 
         STACK()
-        PRINT()
         return
     }
 
@@ -108,18 +116,34 @@
         return
     }
 
-
-
     ///Semantics
-    ;function STACK() {
-        if ( token.trim() !== "" ) {
+    ;function STACK( item ) {
+        if ( item != null ) {
+            stack.push( item )
+        } else if ( token.trim() !== "" ) {
             stack.push( token )
             token = ""
         }
     }
 
-    ;function PRINT() {
-        console.log(stack.pop());
+    ;function POP() {
+        return stack.pop()
+    }
+
+    ;function CREATE_NODE( operator, left, right ) {
+        return {
+            operator: operator,
+            left: left,
+            right: right,
+        }
+    }
+
+    ;function E_SEMANTICS_ONE() {
+        var right = POP()
+        var operator = POP()
+        var left = POP()
+        var node = CREATE_NODE( operator, left, right )            
+        STACK( node )
     }
 
 
@@ -159,7 +183,6 @@
         token += L
         L = exp[ i++ ]
     }
-
 
     ///ERROR HANDLING    
     ;function throwError( message, index ) {        

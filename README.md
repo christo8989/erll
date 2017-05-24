@@ -3,23 +3,32 @@ Just learning about Recursive Descent.
 
 ## Grammar
 
-START -> ID E 
+START -> ID E {POP}
 
-E -> + {STACK} ID E {PRINT} | - {STACK} ID E {PRINT} | * {STACK} ID E {PRINT} | / {STACK} ID E {PRINT} | {empty}
+E -> OPERATOR_MATH {STACK} ID E {E_SEMANTICS_ONE} | {empty}
 
-ID -> [ VAR ] {STACK} {PRINT} | [0..9] {STACK} {PRINT}
+ID -> [ VAR ] {STACK} | [0..9] {STACK}
 
 VAR -> LOWERCASE VAR_NAME
 
 VAR_NAME -> LOWERCASE VAR_NAME | _ VAR_Name | {empty}
 
-NUMBER -> [0..9] NUMBER | {empty} {PUSH}
+NUMBER -> [0..9] NUMBER | {empty}
 
 LOWERCASE -> [a..z]
+
+OPERATOR_MATH -> + | - | * | /
 
 
 ## Semantics
 
-{PRINT} -> console.log(stack.pop())
+{STACK} ->  1. Push token or item onto stack
+            2. token = ""
 
-{STACK} -> stack.push(token)
+{POP} -> 1. Remove top item of the stack
+
+{CREATE_NODE} -> 1. New object with operator, left, right
+
+{E_SEMANTICS_ONE} ->    1. {POP} x3
+                        2. {CREATE_NODE} with popped values
+                        3. {STACK}
