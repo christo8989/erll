@@ -1,9 +1,13 @@
 # parser-recursive-descent
 Just learning about Recursive Descent.
 
-## Grammar - 0.1.0 - MATH_EXPRESSION
+## Grammar - 0.2.0 - CONDITION
 
-START -> MATH_EXPRESSION {POP}
+START -> MATH_EXPRESSION CONDITION | MATH_EXPRESSION
+
+CONDITION -> OPERATOR_CONDITION {PUSH} MATH_EXPRESSION CONDITION {CONDITION_ONE_SEMANTIC} | {empty}
+
+## Grammar - 0.1.0 - MATH_EXPRESSION
 
 MATH_EXPRESSION -> TOKEN MATH | TOKEN
 
@@ -42,6 +46,10 @@ SYMBOL -> [~,`,!,@,#,$,%,^,..] & does not include '
 
 OPERATOR_MATH -> + | - | * | / | %
 
+OPERATOR_CONDITION -> == | != | < OR_EQUAL | > OR_EQUAL
+
+OR_EQUAL -> = | {empty}
+
 
 ## Semantics
 
@@ -54,3 +62,7 @@ OPERATOR_MATH -> + | - | * | / | %
 {MATH_ONE_SEMANTIC} ->  1. {POP} x3
                         2. {CREATE_NODE}
                         3. {PUSH} node
+
+{CONDITION_ONE_SEMANTIC} -> 1. {POP} x3
+                            2. {CREATE_NODE}
+                            3. {PUSH} node

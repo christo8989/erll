@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name]+'7asd asdfaw3@#@sad '*10.745%23-[another_var]"
+    var expression = "[var_name]+3==5>=87"
 
     var result
     Clock.time( "Parse", function () { 
@@ -35,6 +35,21 @@
     ///Parser
     ;function START() {
         MATH_EXPRESSION()
+        CONDITION()
+        return
+    }
+
+    ;function CONDITION() {
+        if ( isOperatorConditionStart( L ) ) {
+            OPERATOR_CONDITION()
+            PUSH()
+
+            MATH_EXPRESSION()
+            CONDITION()
+
+            CONDITION_ONE_SEMANTIC()
+        }
+
         return
     }
 
@@ -148,6 +163,42 @@
         return
     }
 
+    ;function OPERATOR_CONDITION() {
+        if ( L === "=" ) {
+            match( "=" )
+
+            if ( L === "=" ) {
+                match( "=" )
+            } else {
+                throwExpectingError( "OPERATOR_CONDITION", "'='", i )
+            }
+        } else if ( L === "!" ) {
+            match( "!" )
+
+            if ( L === "=" ) {
+                match( "=" )
+            } else {
+                throwExpectingError( "OPERATOR_CONDITION", "'='", i )
+            }
+        } else if ( L === "<" ) {
+            match( "<" )
+            
+            if ( L === "=" ) {
+                match( "=" )
+            }
+        } else if ( L === ">" ) {
+            match( ">" )
+
+            if ( L === "=" ) {
+                match( "=" )
+            }
+        } else {
+            throwExpectingError( "OPERATOR_CONDITION", "'=', '!', '<', or '>'", i )
+        }
+
+        return
+    }
+
     ///Semantics
     ;function PUSH( item ) {
         if ( item != null ) {
@@ -168,6 +219,14 @@
             left: left,
             right: right,
         }
+    }
+
+    ;function CONDITION_ONE_SEMANTIC() {
+        var right = POP()
+        var operator = POP()
+        var left = POP()
+        var node = CREATE_NODE( operator, left, right )
+        PUSH( node )
     }
 
     ;function MATH_ONE_SEMANTIC() {
@@ -197,6 +256,11 @@
         //TODO: Refactor - Use character codes.
         var lowerCaseLetters = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ]
         return lowerCaseLetters.includes( letter )
+    }
+
+    ;function isOperatorConditionStart( letter ) {
+        var operatorConditionStart = [ "=", "!", "<", ">" ]
+        return operatorConditionStart.includes( letter )
     }
 
     ;function isOperatorMath( letter ) {
