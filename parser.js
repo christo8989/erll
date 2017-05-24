@@ -4,12 +4,14 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name]+'7'*10.745"
+    var expression = "[var_name]+'7asd asdfaw3@#@sad '*10.745%23-[another_var]"
+
+    var result
+    Clock.time( "Parse", function () { 
+        result = parser( expression )
+    } )
 
     console.log( "Expression:", expression )
-    Clock.time( "Parse", function () { 
-        parser( expression )
-    } )
     console.log( result )
 
 })(function parser ( expression ) {
@@ -18,20 +20,21 @@
     var token = ""
     var L = ""      //current letter
     var i = 0       //index
-    result = []
-
-    Main()          //Execute Parser
+    var stack = []
 
 
 
-    ;function Main() {
+    return (function Main() {
         next()
         START()
-    }
+        return POP()
+    })()
 
+
+
+    ///Parser
     ;function START() {
         MATH_EXPRESSION()
-        
         return
     }
 
@@ -44,10 +47,12 @@
     ;function MATH() {
         if ( isOperatorMath( L ) ) {
             match( isOperatorMath )
-            addToken()
+            PUSH()
 
             TOKEN()
             MATH()
+
+            MATH_ONE_SEMANTIC()
         } 
 
         return
@@ -76,7 +81,7 @@
             throwExpectingError( "TOKEN", "number, string, or variable", i )
         }
 
-        addToken()
+        PUSH()
         return
     }
 
@@ -143,15 +148,39 @@
         return
     }
 
-
-
-    ;function addToken() {
-        if ( token.trim() !== "" ) {
-            result.push( token )
+    ///Semantics
+    ;function PUSH( item ) {
+        if ( item != null ) {
+            stack.push( item )
+        } else if ( token.trim() !== "" ) {
+            stack.push( token )
             token = ""
         }
     }
 
+    ;function POP() {
+        return stack.pop()
+    }
+
+    ;function CREATE_NODE( operator, left, right ) {
+        return {
+            operator: operator,
+            left: left,
+            right: right,
+        }
+    }
+
+    ;function MATH_ONE_SEMANTIC() {
+        var right = POP()
+        var operator = POP()
+        var left = POP()
+        var node = CREATE_NODE( operator, left, right )
+        PUSH( node )
+    }
+
+
+
+    ///Helpers
     ;function isDigit( letter ) {
         var number
         if ( typeof letter === "string" ) {
@@ -192,8 +221,7 @@
         L = exp[ i++ ]
     }
 
-
-
+    ///ERROR Handling
     ;function throwError( message, index ) {        
         var firstPart = "%c" + exp.substring( 0, index - 1 )
         var letter = "%c" + exp.substring( index - 1, index )
