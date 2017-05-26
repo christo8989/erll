@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name] + 2 == 5 >= false == true"
+    var expression = "[var_name] + 3 == 4 or 5 == 4"
 
     var result
     Clock.time( "Parse", function () { 
@@ -34,6 +34,26 @@
 
     ///Parser
     ;function START() {
+        CONDITION_EXPRESSION()
+        LOGIC()
+        return
+    }
+
+    ;function LOGIC() {
+        if ( isOperatorLogicStart( L ) ) {
+            OPERATOR_LOGIC()
+            PUSH()
+
+            CONDITION_EXPRESSION()
+            LOGIC()
+
+            LOGIC_ONE_SEMANTIC()
+        }
+
+        return
+    }
+
+    ;function CONDITION_EXPRESSION() {
         MATH_EXPRESSION()
         CONDITION()
         return
@@ -188,6 +208,21 @@
         return
     }
 
+    ;function OPERATOR_LOGIC() {
+        if ( L === "a" ) {
+            match( "a" )
+            match( "n" )
+            match( "d" )
+        } else if ( L === "o" ) {
+            match( "o" )
+            match( "r" )
+        } else {
+            throwExpectingError( "OPERATOR_LOGIC", "'and' or 'or'", i )
+        }
+
+        return
+    }
+
     ;function OPERATOR_CONDITION() {
         if ( L === "=" ) {
             match( "=" )
@@ -230,8 +265,9 @@
             stack.push( item )
         } else if ( token.trim() !== "" ) {
             stack.push( token )
-            token = ""
         }
+        
+        token = ""
     }
 
     ;function POP() {
@@ -244,6 +280,14 @@
             left: left,
             right: right,
         }
+    }
+
+    ;function LOGIC_ONE_SEMANTIC() {
+        var right = POP()
+        var operator = POP()
+        var left = POP()
+        var node = CREATE_NODE( operator, left, right )
+        PUSH( node )
     }
 
     ;function CONDITION_ONE_SEMANTIC() {
@@ -292,6 +336,11 @@
     ;function isOperatorConditionStart( letter ) {
         var operatorConditionStart = [ "=", "!", "<", ">" ]
         return operatorConditionStart.includes( letter )
+    }
+
+    ;function isOperatorLogicStart( letter ) {
+        var operatorLogicStart = [ "a", "o" ]
+        return operatorLogicStart.includes( letter )
     }
 
     ;function isOperatorMath( letter ) {
