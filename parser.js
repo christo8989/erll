@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name] + 2 == 5 >= 87"
+    var expression = "[var_name] + 2 == 5 >= false == true"
 
     var result
     Clock.time( "Parse", function () { 
@@ -94,10 +94,32 @@
                 throwExpectingError( "TOKEN", "lowercase letter [a..z], '_', or ']'", i )
             }
             match( "]" )
+        } else if ( L === "t" || L === "f" ) {
+            BOOL()
         } else {
             throwExpectingError( "TOKEN", "number, string, or variable", i )
         }
         ignoreWhitespaces()
+
+        PUSH()
+        return
+    }
+
+    ;function BOOL() {
+        if ( L === "t" ) {
+            match( "t" )
+            match( "r" )
+            match( "u" )
+            match( "e" )
+        } else if ( L === "f" ) {
+            match( "f" )
+            match( "a" )
+            match( "l" )
+            match( "s" )
+            match( "e" )
+        } else {
+            throwExpectingError( "BOOL", "true or false", i )
+        }
 
         PUSH()
         return
