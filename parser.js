@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name]+3==5>=87"
+    var expression = "   [var_name]  +   2 ==  5  >=   87   "
 
     var result
     Clock.time( "Parse", function () { 
@@ -25,7 +25,7 @@
 
 
     return (function Main() {
-        next()
+        appendAndNext()
         START()
         return POP()
     })()
@@ -74,6 +74,8 @@
     }
     
     ;function TOKEN() {
+        ignoreWhitespaces()
+
         if ( isDigit( L ) ) {
             match( isDigit )
             NUMBER()
@@ -95,6 +97,7 @@
         } else {
             throwExpectingError( "TOKEN", "number, string, or variable", i )
         }
+        ignoreWhitespaces()
 
         PUSH()
         return
@@ -240,6 +243,12 @@
 
 
     ///Helpers
+    ;function ignoreWhitespaces() {
+        while( L === " " ) {
+            next()
+        }
+    }
+
     ;function isDigit( letter ) {
         var number
         if ( typeof letter === "string" ) {
@@ -273,22 +282,25 @@
             || ( Array.isArray( item ) && item.includes( L ) )
             || ( item === L )
         if ( isCorrect ) {
-            next()
-            return true
+            appendAndNext()
         } else {
             throwError( "There was a mismatch", i )
         }
     }
 
     ;function next() {	
-        token += L
         L = exp[ i++ ]
+    }
+
+    ;function appendAndNext() {
+        token += L
+        next()
     }
 
     ///ERROR Handling
     ;function throwError( message, index ) {        
         var firstPart = "%c" + exp.substring( 0, index - 1 )
-        var letter = "%c" + exp.substring( index - 1, index )
+        var letter = "%c" + exp.substring( index - 1, index)
         var secondPart = "%c" + exp.substring( index )
         var fontSize = "font-size: 16px;"
         var partCss = "color:grey;" + fontSize
