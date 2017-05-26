@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "   [var_name]  +   2 ==  5  >=   87   "
+    var expression = "[var_name] + 2 == 5 >= 87"
 
     var result
     Clock.time( "Parse", function () { 
@@ -300,11 +300,13 @@
     ///ERROR Handling
     ;function throwError( message, index ) {        
         var firstPart = "%c" + exp.substring( 0, index - 1 )
-        var letter = "%c" + exp.substring( index - 1, index)
+        var letter = exp.substring( index - 1, index)
+        letter = "%c" + (letter === " " ? "_" : letter) //highlight whitespace with underscore
         var secondPart = "%c" + exp.substring( index )
         var fontSize = "font-size: 16px;"
         var partCss = "color:grey;" + fontSize
-        var letterCss = "color:white;" + fontSize
+        var letterCss = "color:white;" + fontSize //dark scheme
+        //var letterCss = "color:black;" + fontSize //light scheme
         console.info( firstPart + letter + secondPart , partCss, letterCss, partCss )
 
         var error = new Error( message )
