@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "[var_name] + 3 == 4 or 5 == 4"
+    var expression = "((2 == 3) + 4)"
 
     var result
     Clock.time( "Parse", function () { 
@@ -40,6 +40,8 @@
     }
 
     ;function LOGIC() {
+        ignoreWhitespaces()
+        
         if ( isOperatorLogicStart( L ) ) {
             OPERATOR_LOGIC()
             PUSH()
@@ -60,6 +62,8 @@
     }
 
     ;function CONDITION() {
+        ignoreWhitespaces()
+        
         if ( isOperatorConditionStart( L ) ) {
             OPERATOR_CONDITION()
             PUSH()
@@ -74,21 +78,43 @@
     }
 
     ;function MATH_EXPRESSION() {  
-        TOKEN()
+        PARENTHESIS_EXPRESSION()
         MATH()
         return
     }
 
     ;function MATH() {
+        ignoreWhitespaces()
+
         if ( isOperatorMath( L ) ) {
             match( isOperatorMath )
             PUSH()
 
-            TOKEN()
+            PARENTHESIS_EXPRESSION()
             MATH()
 
             MATH_ONE_SEMANTIC()
         } 
+
+        return
+    }
+
+    ;function PARENTHESIS_EXPRESSION() {
+        ignoreWhitespaces()
+
+        if ( L === "(" ) {
+            skip( "(" )
+            START()
+
+            if ( L === ")" ) {
+                skip( ")" )
+            } else {
+                throwExpectingError( "PARENTHESIS_EXPRESSION", "')'", i )
+            }
+
+        } else {
+            TOKEN()
+        }
 
         return
     }
@@ -119,7 +145,6 @@
         } else {
             throwExpectingError( "TOKEN", "number, string, or variable", i )
         }
-        ignoreWhitespaces()
 
         PUSH()
         return
@@ -358,11 +383,20 @@
             throwError( "There was a mismatch", i )
         }
     }
+    ;function skip( item ) {        
+        var isCorrect = ( typeof item === "function" && item( L ) )
+            || ( Array.isArray( item ) && item.includes( L ) )
+            || ( item === L )
+        if ( isCorrect ) {
+            next()
+        } else {
+            throwError( "There was a mismatch", i )
+        }
+    }
 
     ;function next() {	
         L = exp[ i++ ]
     }
-
     ;function appendAndNext() {
         token += L
         next()
@@ -372,7 +406,7 @@
     ;function throwError( message, index ) {        
         var firstPart = "%c" + exp.substring( 0, index - 1 )
         var letter = exp.substring( index - 1, index)
-        letter = "%c" + (letter === " " ? "_" : letter) //highlight whitespace with underscore
+        letter = "%c" + (letter == null || letter.trim() === "" ? "_" : letter) //highlight whitespace with underscore
         var secondPart = "%c" + exp.substring( index )
         var fontSize = "font-size: 16px;"
         var partCss = "color:grey;" + fontSize
@@ -380,15 +414,18 @@
         //var letterCss = "color:black;" + fontSize //light scheme
         console.info( firstPart + letter + secondPart , partCss, letterCss, partCss )
 
+        var indexMessage = index >= exp.length
+            ? " at the last character."
+            : " at character " + index + "."
+        message += indexMessage
         var error = new Error( message )
         throw error
     }
 
     ;function throwExpectingError( functionName, expecting, index ) {
         var message = "In function '" 
-            + functionName + "', expecting a(n) " 
-            + expecting + " at character " 
-            + index + ".";
+            + functionName + "', expecting a(n) "
+            + expecting
         
         throwError( message, index )
     }
