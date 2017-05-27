@@ -49,7 +49,7 @@ VAR -> LOWERCASE VAR_NAME
 VAR_NAME -> LOWERCASE VAR_NAME | _ VAR_NAME | {empty}
 
 
-## Grammar - Literals
+## Literals
 
 BOOL -> true | false
 
