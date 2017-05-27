@@ -4,7 +4,7 @@
 (function IIFE ( parser ) {
 
     var Clock = window.Clock
-    var expression = "((2 == 3) + 4)"
+    var expression = "[var] + 3"
 
     var result
     Clock.time( "Parse", function () { 
@@ -122,31 +122,46 @@
     ;function TOKEN() {
         ignoreWhitespaces()
 
+        var node;
         if ( isDigit( L ) ) {
             match( isDigit )
             NUMBER()
+
+            node = LiteralNode( token, typeof 0 )
+            PUSH(node)
         } else if ( L === "." ) {
             match( "." )
             RATIONAL()
+
+            node = LiteralNode( token, typeof 0 )
+            PUSH(node)
         } else if ( L === "'" ) {
-            match( "'" )
+            skip( "'" )
             STRING()
-            match( "'" )
+            skip( "'" )
+
+            node = LiteralNode( token.trim(), typeof "" )
+            PUSH(node)
+        } else if ( L === "t" || L === "f" ) {
+            BOOL()
+
+            node = LiteralNode( token, typeof true )
+            PUSH(node)
         } else if ( L === "[" ) {
-            match( "[" )
+            skip( "[" )
             VAR()
 
             if ( L !== "]" ) {
                 throwExpectingError( "TOKEN", "lowercase letter [a..z], '_', or ']'", i )
             }
-            match( "]" )
-        } else if ( L === "t" || L === "f" ) {
-            BOOL()
+            skip( "]" )
+
+            node = IdentifierNode( token )
+            PUSH(node)
         } else {
             throwExpectingError( "TOKEN", "number, string, or variable", i )
         }
 
-        PUSH()
         return
     }
 
@@ -166,7 +181,6 @@
             throwExpectingError( "BOOL", "true or false", i )
         }
 
-        PUSH()
         return
     }
 
@@ -286,7 +300,7 @@
 
     ///Semantics
     ;function PUSH( item ) {
-        if ( item != null ) {
+        if ( typeof item === "object" ) {
             stack.push( item )
         } else if ( token.trim() !== "" ) {
             stack.push( token )
@@ -299,19 +313,11 @@
         return stack.pop()
     }
 
-    ;function CREATE_NODE( operator, left, right ) {
-        return {
-            operator: operator,
-            left: left,
-            right: right,
-        }
-    }
-
     ;function LOGIC_ONE_SEMANTIC() {
         var right = POP()
         var operator = POP()
         var left = POP()
-        var node = CREATE_NODE( operator, left, right )
+        var node = LogicalExpression( operator, left, right )
         PUSH( node )
     }
 
@@ -319,7 +325,7 @@
         var right = POP()
         var operator = POP()
         var left = POP()
-        var node = CREATE_NODE( operator, left, right )
+        var node = BinaryExpression( operator, left, right )
         PUSH( node )
     }
 
@@ -327,8 +333,43 @@
         var right = POP()
         var operator = POP()
         var left = POP()
-        var node = CREATE_NODE( operator, left, right )
+        var node = BinaryExpression( operator, left, right )
         PUSH( node )
+    }
+
+    //Nodes
+    ;function LiteralNode( value, valueType ) {
+        return {
+            type: "Literal",
+            value: parseType( value, valueType ),
+            valueType: valueType,
+        }
+    }
+
+    ;function IdentifierNode( name ) {
+        return {
+            type: "Identifier",
+            name: name,
+            valueType: undefined,
+        }
+    }
+
+    ;function BinaryExpression( operator, left, right ) {
+        return {
+            type: "BinaryExpression",
+            operator: operator,
+            left: left,
+            right: right,
+        }
+    }
+
+    ;function LogicalExpression( operator, left, right ) {
+        return {
+            type: "LogicalExpression",
+            operator: operator,
+            left: left,
+            right: right,
+        }
     }
 
 
@@ -400,6 +441,19 @@
     ;function appendAndNext() {
         token += L
         next()
+    }
+
+    ;function parseType( value, valueType ) {
+        switch ( valueType ) {
+            case typeof "":
+                return value.toString()
+            case typeof 0:
+                return parseFloat( value )
+            case typeof true:
+                return value === "true" || value === true
+            default:
+                return ""
+        }
     }
 
     ///ERROR Handling

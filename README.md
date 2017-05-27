@@ -91,3 +91,42 @@ OPERATOR_LOGIC -> and | or
 {MATH_ONE_SEMANTIC} ->  1. {POP} x3
                         2. {CREATE_NODE}
                         3. {PUSH} node
+
+
+# AST Structure
+
+interface Literal = {
+    type: "Literal",
+    value: string | bool | number | date | empty,
+    valueType: @compileTime,
+}
+
+interface Identifier = {
+    type: "Identifier",
+    name: string,
+    valueType: @runTime,
+}
+
+interface BinaryExpression = {
+    type: "BinaryExpression",
+    operator: BinaryOperator,
+    left: Expression,
+    right: Expression,
+}
+
+interface LogicalExpression = {
+    type: "LogicalExpression",
+    operator: LogicalOperator,
+    left: Expression,
+    right: Expression,
+}
+
+BinaryOperator = [  
+    +, -, *, /, 
+    %, ==, !=, >, 
+    <, >=, <= 
+]
+
+LogicalOperator = [
+    and, or
+]
