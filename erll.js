@@ -505,13 +505,13 @@
 
                     if ( (leftToken.type === "Identifier" || rightToken.type === "Identifier")
                         && (typeof result === "boolean" && !result ) ) {
-                        var message;
+                        var message = "The property ";
                         if ( leftToken.type === "Identifier" ) {
-                            message = leftToken.name + " "
+                            message += "'" + leftToken.name + "'(" + left + ") "
                             message += ERROR_OPERATOR_REASON( token.operator ) + " ";
-                            message += rightToken.type === "Identifier" ? rightToken.name : right
+                            message += rightToken.type === "Identifier" ? "the property '" + rightToken.name + "'(" + right + ")" : right
                         } else if ( rightToken.type === "Identifier" ) {
-                            message = rightToken.name + " "
+                            message += "'" + rightToken.name + "'(" + right + ") "
                             message += ERROR_OPERATOR_REASON( token.operator, true ) + " " + left                        
                         }
 
