@@ -1,20 +1,29 @@
 /// Recursive Descent Parser
 //https://www.youtube.com/watch?v=SH5F-rwWEog&t=3m12s
 
-(function IIFE ( parser ) {
+(function IIFE ( parser, executer ) {
 
     var Clock = window.Clock
-    var expression = "[var] + 3"
+    var expression = "[name] == 'chris' and 20 < [age]"
+
+    var ast
+    Clock.time( "Parse", function () { 
+        ast = parser( expression )
+    } )
 
     var result
-    Clock.time( "Parse", function () { 
-        result = parser( expression )
+    Clock.time( "Execute", function () {
+        result = executer( ast, { 
+            name: "chris",
+            age: 19, 
+        } )
     } )
 
     console.log( "Expression:", expression )
+    console.log( ast )
     console.log( result )
 
-})(function parser ( expression ) {
+})( function parser ( expression ) {
 
     var exp = expression
     var token = ""
@@ -484,5 +493,87 @@
         throwError( message, index )
     }
 
-})
+},
+function executer ( ast, dictionary ) {
+    var final = {
+        value: null,
+        errors: [],
+    }
+
+
+    return (function Main() {
+        final.value = START( ast )
+        return final
+    })()
+
+    
+    ;function START( token ) {
+        switch ( token.type ) {
+            case "BinaryExpression":
+            case "LogicalExpression":
+                var leftToken = token.left
+                var left = START( token.left )
+
+                var rightToken = token.right
+                var right = START( token.right )
+
+                var result = EXECUTE_OPERATOR( token.operator, left, right )
+
+                if ( (leftToken.type === "Identifier" || rightToken.type === "Identifier")
+                    && (typeof result === "boolean" && !result ) ) {
+                    var message;
+                    if ( leftToken.type === "Identifier" ) {
+                        message = leftToken.name + " "
+                        message += ERROR_OPERATOR_REASON( token.operator ) + " ";
+                        message += rightToken.type === "Identifier" ? rightToken.name : right
+                    } else if ( rightToken.type === "Identifier" ) {
+                        message = rightToken.name + " "
+                        message += ERROR_OPERATOR_REASON( token.operator, true ) + " " + left                        
+                    }
+
+                    message += "."
+                    final.errors.push( message )
+                }
+
+                return result
+            case "Literal":
+                return token.value
+            case "Identifier":
+                return LOOK_UP( token.name )
+        }
+    }
+
+    ;function EXECUTE_OPERATOR( operator, left, right ) {
+        switch ( operator ) {
+            case "+": return left + right
+            case "-": return left - right
+            case "*": return left * right
+            case "/": return left / right
+            case "%": return left % right
+            case "==": return left == right
+            case "!=": return left != right
+            case "<": return left < right
+            case ">": return left > right
+            case "<=": return left <= right
+            case ">=": return left >= right
+            case "and": return left && right
+            case "or": return left || right
+        }
+    }
+
+    ;function LOOK_UP( name ) {
+        return dictionary[name];
+    }
+
+    ;function ERROR_OPERATOR_REASON( operator, invert ) {
+        switch ( operator ) {
+            case "==": return "does not equal"
+            case "!=": return "equals"
+            case "<": return invert ? "is less than or equal to" : "is greater than or equal to"
+            case ">": return invert ? "is greater than or equal to" : "is less than or equal to"
+            case "<=": return invert ? "is less than" : "is greater than"
+            case ">=": return invert ? "is greater than" : "is less than"
+        }
+    }
+} )
 
