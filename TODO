@@ -1,0 +1,5 @@
+jQuery Alternatives
+https://tutorialzine.com/2012/04/5-lightweight-jquery-alternatives
+I like this one: https://github.com/honza/140medley
+
+For animations, use velocity: http://velocityjs.org/
