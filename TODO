@@ -1,0 +1,17 @@
+jQuery Alternatives
+https://tutorialzine.com/2012/04/5-lightweight-jquery-alternatives
+I like this one: https://github.com/honza/140medley
+
+For animations, use velocity: http://velocityjs.org/
+
+
+
+Other stuff...
+
+### LEARNING
+1. http://www.cs.ru.ac.za/compilers/pdfvers.pdf
+2. http://homepage.divms.uiowa.edu/~slonnegr/plf/Book/
+### NOTES
+ 1. Build more descriptive AST with type information or something to that effect.
+ 3. Add null or empty
+ 4. AST structure - https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API
