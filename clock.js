@@ -27,7 +27,8 @@
 		this.start();
 		fn();
 		var tEnd = this.getMilliseconds( 2 );
-		console.log( Name + " ended. " + tEnd + "ms" );
+    console.log( Name + " ended. " + tEnd + "ms" );
+    return tEnd;
 	}
 
 	Clock.prototype.timeRaw = function ( Name, fn ) {

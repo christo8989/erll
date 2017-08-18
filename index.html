@@ -4,10 +4,105 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>ERLL</title> 
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+  <!-- CSS Reset -->
+  <link rel="stylesheet" href="http://cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+  <!-- Milligram CSS minified -->
+  <link rel="stylesheet" href="http://cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  
+  <style>
+    body {
+      background-color: #14141f;
+      color: #f2e6ff;
+    }
+
+    hr {
+      border-top: 0.1rem solid #f2e6ff;
+    }
+
+    input[type='text'] {
+      background-color: #14141f;
+      border: none;
+      border-bottom: 1px solid #eeffcc;
+      color: #f7ffe6;
+    }
+
+    label {
+      display: inline-block;
+      cursor: pointer;
+      color: #eeffcc;
+    }
+
+    .color--string {
+      color: #e68a00;
+    }
+
+    .color--number {
+      color: #99cc00;
+    }
+
+    .color--boolean {
+      color: #66a3ff;
+    }
+
+    .color--object {
+      color: #b3d9ff;
+    }
+
+
+    .color--error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <script src="clock.js"></script>
-  <script src="erll.js"></script>
-  <script src="test.js"></script> 
+  <br />
+  <div class="container">
+    <h1>Welcom to ERLL!</h1>
+    <h2>Easy to Read Logical Language</h2>
+
+    <br />
+    <hr />
+
+    <div class="column">
+      <p>Query information about our pal Dave. His attributes are below.</p>
+      <div class="row">
+
+        <div class="column column-25 column-offset-10">
+          <dl class="color--object">
+            <dt>name: <span class="color--string">'Dave'</span></dt>
+            <dt>age: <span class="color--number">42</span></dt>
+            <dt>has_ice_cream: <span class="color--boolean">true</span></dt>
+          </dl>
+        </div>
+
+        <div class="column column-65">
+          <label for="Expression">Expression</label>
+          <input type="text" id="Expression" placeholder="Expression" />
+          <div class="button container--expression--button" onclick="onEvaluate()">Evaluate</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="column column-25 column-offset-10">
+          <span id="ResultOverall"></span>
+        </div>
+        <div class="column column-65">
+          <dl id="Results"></dl>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="container--body">
+      <div class="container--body--rules"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="140medley.min.js"></script>
+  <script type="text/javascript" src="clock.js"></script>
+  <script type="text/javascript" src="erll.js"></script>
+  <script type="text/javascript" src="test.js"></script> 
 </body>
 </html>
